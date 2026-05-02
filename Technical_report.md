@@ -80,7 +80,8 @@ Parent-document chunking produced more focused candidate sets and improved downs
 
 ---
 
-## 4. Hybrid Retrieval Strategy
+## 4. Hybrid Retrieval Strategy:
+
 
 The system combines:
 
@@ -88,3 +89,88 @@ The system combines:
 - **Sparse Retrieval** (BM25 keyword matching)
 
 Hybrid scoring function:
+Final Score = α × Dense Score + (1 − α) × Sparse Score
+
+
+### Why Hybrid?
+
+Dense retrieval captures semantic meaning but may miss:
+
+- Exact acronyms
+- Numerical identifiers
+- Domain-specific terminology
+
+Sparse retrieval captures exact matches but lacks semantic understanding.
+
+Hybrid search balances both, improving recall and precision in structured datasets.
+
+---
+
+## 5. Reranking for Precision Optimization
+
+After hybrid retrieval, the top 25 candidates are passed to a cross-encoder reranker.
+
+The reranker evaluates each (query, chunk) pair jointly and assigns a strict relevance score. Only the top 5 reranked chunks are passed to the LLM.
+
+### Observed Improvements
+
+Without reranking:
+- Semantically similar but contextually irrelevant chunks were included.
+
+With reranking:
+- Irrelevant chunks were filtered.
+- Context became more focused.
+- Answer quality improved significantly for analytical and comparative queries.
+
+Example observation:
+A multi-section comparison query initially retrieved loosely related passages. After reranking, only directly relevant sections remained, producing a more structured and accurate response.
+
+---
+
+## 6. Evaluation Methodology
+
+A manual evaluation set of 10 difficult, domain-specific questions was created. The questions required:
+
+- Cross-section reasoning
+- Numerical comparisons
+- Concept differentiation
+- Precise technical references
+
+Evaluation comparisons included:
+
+- Fixed vs Parent chunking
+- Dense-only vs Hybrid retrieval
+- Hybrid vs Hybrid + Reranker
+
+### Key Findings
+
+- Hybrid retrieval outperformed dense-only retrieval for exact-term queries.
+- Reranking significantly improved precision and reduced noise.
+- Parent-document chunking improved answer coherence and relevance.
+
+---
+
+## 7. Conclusion
+
+HybridRAG-Pro demonstrates that retrieval optimization is more critical than LLM capability alone in domain-specific RAG systems.
+
+Performance gains were achieved through:
+
+- Structured chunking strategies
+- Dense + sparse hybrid retrieval
+- Cross-encoder reranking
+- Metadata-aware indexing
+
+The system reflects modern enterprise RAG architecture principles and emphasizes retrieval quality, modular design, and evaluation-driven improvement.
+
+---
+
+## Future Improvements
+
+- Query rewriting for improved recall
+- Automatic citation highlighting
+- Retrieval latency benchmarking
+- Adaptive alpha tuning for hybrid weighting
+- Automated evaluation metrics (precision@k, MRR)
+
+---
